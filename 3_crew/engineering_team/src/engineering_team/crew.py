@@ -1,6 +1,19 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
+import os
+from dotenv import load_dotenv
+from crewai import LLM
+
+load_dotenv()
+
+# Initialize custom LLM using credentials from .env
+llm = LLM(
+    model="openai/openai.gpt-4o",
+    base_url=os.environ.get("base_url"),
+    api_key=os.environ.get("GENERATIVE_ENGINE_API_KEY")
+)
+
 
 
 @CrewBase
@@ -15,6 +28,7 @@ class EngineeringTeam():
         return Agent(
             config=self.agents_config['engineering_lead'],
             verbose=True,
+            llm=llm
         )
 
     @agent
@@ -22,10 +36,8 @@ class EngineeringTeam():
         return Agent(
             config=self.agents_config['backend_engineer'],
             verbose=True,
-            allow_code_execution=True,
-            code_execution_mode="safe",  # Uses Docker for safety
-            max_execution_time=500, 
-            max_retry_limit=3 
+            allow_code_execution=False, # Disabled: Docker not installed
+            llm=llm
         )
     
     @agent
@@ -33,6 +45,7 @@ class EngineeringTeam():
         return Agent(
             config=self.agents_config['frontend_engineer'],
             verbose=True,
+            llm=llm
         )
     
     @agent
@@ -40,10 +53,8 @@ class EngineeringTeam():
         return Agent(
             config=self.agents_config['test_engineer'],
             verbose=True,
-            allow_code_execution=True,
-            code_execution_mode="safe",  # Uses Docker for safety
-            max_execution_time=500, 
-            max_retry_limit=3 
+            allow_code_execution=False, # Disabled: Docker not installed
+            llm=llm
         )
 
     @task
